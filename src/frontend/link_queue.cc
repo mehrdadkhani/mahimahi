@@ -26,7 +26,8 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
       throughput_graph_( nullptr ),
       delay_graph_( nullptr ),
       repeat_( repeat ),
-      finished_( false )
+      finished_( false ),
+      server_socket_()
 {
     assert_not_root();
 
@@ -101,6 +102,9 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
                                                  1, false, 250,
                                                  [] ( int, int & x ) { x = -1; } ) );
     }
+
+    server_socket_.bind( Address::local( "test_file" ) );
+    server_socket_.listen();
 }
 
 void LinkQueue::record_arrival( const uint64_t arrival_time, const size_t pkt_size )
@@ -255,4 +259,14 @@ unsigned int LinkQueue::wait_time( void )
 bool LinkQueue::pending_output( void ) const
 {
     return not output_queue_.empty();
+}
+
+void LinkQueue::register_events(EventLoop & event_loop)
+{
+    // this would be a good place to add our PF_LOCAL socket to the event loop
+    // for reading and possibly for writing
+    event_loop.add_simple_input_handler( server_socket_, [&] () {
+        LocalStreamSocket client_socket = server_socket_.accept();
+        return ResultType::Continue;
+    } );
 }

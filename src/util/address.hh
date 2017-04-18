@@ -6,6 +6,7 @@
 #include <string>
 #include <utility>
 
+#include <sys/un.h>
 #include <netinet/in.h>
 #include <netdb.h>
 
@@ -37,6 +38,9 @@ public:
 
     /* construct with numerical IP address and numeral port number */
     Address( const std::string & ip, const uint16_t port );
+
+    /* construct with local domain path */
+    static Address local( const std::string & path );
 
     /* accessors */
     std::pair<std::string, uint16_t> ip_port( void ) const;

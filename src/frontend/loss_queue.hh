@@ -9,8 +9,9 @@
 #include <random>
 
 #include "file_descriptor.hh"
+#include "ferry_queue.hh"
 
-class LossQueue
+class LossQueue : AbstractFerryQueue
 {
 private:
     std::queue<std::string> packet_queue_ {};

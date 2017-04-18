@@ -12,8 +12,10 @@
 #include "file_descriptor.hh"
 #include "binned_livegraph.hh"
 #include "abstract_packet_queue.hh"
+#include "ferry_queue.hh"
+#include "socket.hh"
 
-class LinkQueue
+class LinkQueue : AbstractFerryQueue
 {
 private:
     const static unsigned int PACKET_SIZE = 1504; /* default max TUN payload size */
@@ -33,6 +35,8 @@ private:
 
     bool repeat_;
     bool finished_;
+
+    LocalStreamSocket server_socket_;
 
     uint64_t next_delivery_time( void ) const;
 
@@ -60,6 +64,8 @@ public:
     bool pending_output( void ) const;
 
     bool finished( void ) const { return finished_; }
+
+    void register_events(EventLoop &);
 };
 
 #endif /* LINK_QUEUE_HH */

@@ -114,6 +114,14 @@ Address::Address( const std::string & ip, const uint16_t port )
     *this = Address( ip, ::to_string( port ), hints );
 }
 
+Address Address::local( const std::string & path )
+{
+    sockaddr_un addr;
+    addr.sun_family = AF_UNIX;
+    strncpy(addr.sun_path, path.c_str(), sizeof(addr.sun_path));
+    return Address( *(sockaddr *)&addr, sizeof(sockaddr_un) );
+}
+
 /* accessors */
 
 pair<string, uint16_t> Address::ip_port( void ) const

@@ -9,8 +9,9 @@
 
 #include "file_descriptor.hh"
 #include "binned_livegraph.hh"
+#include "ferry_queue.hh"
 
-class MeterQueue
+class MeterQueue : AbstractFerryQueue
 {
 private:
     std::queue<std::string> packet_queue_;

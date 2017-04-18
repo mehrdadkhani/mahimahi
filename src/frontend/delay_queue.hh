@@ -8,8 +8,9 @@
 #include <string>
 
 #include "file_descriptor.hh"
+#include "ferry_queue.hh"
 
-class DelayQueue
+class DelayQueue : AbstractFerryQueue
 {
 private:
     uint64_t delay_ms_;

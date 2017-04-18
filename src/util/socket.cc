@@ -115,11 +115,22 @@ void TCPSocket::listen( const int backlog )
     SystemCall( "listen", ::listen( fd_num(), backlog ) );
 }
 
+void LocalStreamSocket::listen( const int backlog )
+{
+    SystemCall( "listen", ::listen( fd_num(), backlog ) );
+}
+
 /* accept a new incoming connection */
 TCPSocket TCPSocket::accept( void )
 {
     register_read();
     return TCPSocket( FileDescriptor( SystemCall( "accept", ::accept( fd_num(), nullptr, nullptr ) ) ) );
+}
+
+LocalStreamSocket LocalStreamSocket::accept( void )
+{
+    register_read();
+    return LocalStreamSocket( FileDescriptor( SystemCall( "accept", ::accept( fd_num(), nullptr, nullptr ) ) ) );
 }
 
 /* get socket option */

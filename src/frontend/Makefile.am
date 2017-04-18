@@ -2,27 +2,27 @@ AM_CPPFLAGS = -I../protobufs -I$(srcdir)/../util -I$(srcdir)/../packet -I$(srcdi
 AM_CXXFLAGS = $(PICKY_CXXFLAGS)
 
 bin_PROGRAMS = mm-delay
-mm_delay_SOURCES = delayshell.cc delay_queue.hh delay_queue.cc
+mm_delay_SOURCES = delayshell.cc delay_queue.hh delay_queue.cc ferry_queue.cc ferry_queue.hh
 mm_delay_LDADD = -lrt ../util/libutil.a ../packet/libpacket.a
 mm_delay_LDFLAGS = -pthread
 
 bin_PROGRAMS += mm-loss
-mm_loss_SOURCES = lossshell.cc loss_queue.hh loss_queue.cc
+mm_loss_SOURCES = lossshell.cc loss_queue.hh loss_queue.cc ferry_queue.cc ferry_queue.hh
 mm_loss_LDADD = -lrt ../util/libutil.a ../packet/libpacket.a
 mm_loss_LDFLAGS = -pthread
 
 bin_PROGRAMS += mm-onoff
-mm_onoff_SOURCES = onoffshell.cc loss_queue.hh loss_queue.cc
+mm_onoff_SOURCES = onoffshell.cc loss_queue.hh loss_queue.cc ferry_queue.cc ferry_queue.hh
 mm_onoff_LDADD = -lrt ../util/libutil.a ../packet/libpacket.a
 mm_onoff_LDFLAGS = -pthread
 
 bin_PROGRAMS += mm-link
-mm_link_SOURCES = linkshell.cc link_queue.hh link_queue.cc
+mm_link_SOURCES = linkshell.cc link_queue.hh link_queue.cc ferry_queue.cc ferry_queue.hh
 mm_link_LDADD = -lrt ../util/libutil.a ../packet/libpacket.a ../graphing/libgraph.a $(XCBPRESENT_LIBS) $(XCB_LIBS) $(PANGOCAIRO_LIBS)
 mm_link_LDFLAGS = -pthread
 
 bin_PROGRAMS += mm-meter
-mm_meter_SOURCES = meter.cc meter_queue.hh meter_queue.cc
+mm_meter_SOURCES = meter.cc meter_queue.hh meter_queue.cc ferry_queue.cc ferry_queue.hh
 mm_meter_LDADD = -lrt ../util/libutil.a ../packet/libpacket.a ../graphing/libgraph.a $(XCBPRESENT_LIBS) $(XCB_LIBS) $(PANGOCAIRO_LIBS)
 mm_meter_LDFLAGS = -pthread
 
