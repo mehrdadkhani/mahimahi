@@ -2,6 +2,7 @@
 
 #include <limits>
 #include <cassert>
+#include <thread>
 
 #include "link_queue.hh"
 #include "timestamp.hh"
@@ -27,7 +28,7 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
       delay_graph_( nullptr ),
       repeat_( repeat ),
       finished_( false ),
-      server_socket_()
+      listener_socket_()
 {
     assert_not_root();
 
@@ -103,8 +104,8 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
                                                  [] ( int, int & x ) { x = -1; } ) );
     }
 
-    server_socket_.bind( Address::local( "test_file" ) );
-    server_socket_.listen();
+    listener_socket_.bind( Address::local( "test_file" ) );
+    listener_socket_.listen();
 }
 
 void LinkQueue::record_arrival( const uint64_t arrival_time, const size_t pkt_size )
@@ -261,12 +262,35 @@ bool LinkQueue::pending_output( void ) const
     return not output_queue_.empty();
 }
 
+void LinkQueue::loop( LocalStreamSocket & client )
+{
+    Poller poller;
+
+    string buffer = client.read()
+    cerr << buffer << endl;
+    client.write("Koo koo kachoo");
+}
+
+void LinkQueue::handle_connection( void )
+{
+    LocalStreamSocket client_socket = listener_socket_.accept();
+
+    thread newthread( [&] ( LocalStreamSocket client ) {
+            try {
+                loop( client );
+            } catch ( const exception & e ) {
+                print_exception( e );
+            }
+        }, listener_socket_.accept() );
+
+    /* don't wait around for the reply */
+    newthread.detach();
+}
+
 void LinkQueue::register_events(EventLoop & event_loop)
 {
-    // this would be a good place to add our PF_LOCAL socket to the event loop
-    // for reading and possibly for writing
-    event_loop.add_simple_input_handler( server_socket_, [&] () {
-        LocalStreamSocket client_socket = server_socket_.accept();
+    event_loop.add_simple_input_handler( listener_socket_, [&] () {
+        handle_connection();
         return ResultType::Continue;
     } );
 }

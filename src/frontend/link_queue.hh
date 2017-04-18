@@ -36,7 +36,7 @@ private:
     bool repeat_;
     bool finished_;
 
-    LocalStreamSocket server_socket_;
+    LocalStreamSocket listener_socket_;
 
     uint64_t next_delivery_time( void ) const;
 
@@ -48,6 +48,9 @@ private:
 
     void rationalize( const uint64_t now );
     void dequeue_packet( void );
+
+    void handle_connection( void );
+    void loop( LocalStreamSocket & client );
 
 public:
     LinkQueue( const std::string & link_name, const std::string & filename, const std::string & logfile,
