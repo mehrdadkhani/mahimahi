@@ -68,13 +68,16 @@ public:
 class TCPSocket : public Socket
 {
 protected:
-    TCPSocket( FileDescriptor && fd ) : Socket( std::move( fd ), PF_INET, SOCK_STREAM ) {}
+    /* constructor used by accept() and SecureSocket() */
+    TCPSocket( FileDescriptor && fd ) : Socket( std::move( fd ), AF_INET, SOCK_STREAM ) {}
 
 public:
-    TCPSocket() : Socket( PF_INET, SOCK_STREAM ) {}
+    TCPSocket() : Socket( AF_INET, SOCK_STREAM ) {}
 
+    /* mark the socket as listening for incoming connections */
     void listen( const int backlog = 16 );
 
+    /* accept a new incoming connection */
     TCPSocket accept( void );
 
     /* original destination of a DNAT connection */
