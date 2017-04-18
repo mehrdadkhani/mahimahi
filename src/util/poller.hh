@@ -57,6 +57,7 @@ public:
 
     Poller() : actions_(), pollfds_() {}
     void add_action( Action action );
+    void remove_actions_for_file( FileDescriptor & fd );
     Result poll( const int & timeout_ms );
 };
 
