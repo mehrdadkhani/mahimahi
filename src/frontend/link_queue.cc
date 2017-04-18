@@ -3,14 +3,19 @@
 #include <limits>
 #include <cassert>
 #include <thread>
+#include <iostream>
+#include <sstream>
+#include <queue>
 
 #include "link_queue.hh"
 #include "timestamp.hh"
 #include "util.hh"
 #include "ezio.hh"
 #include "abstract_packet_queue.hh"
+#include "exception.hh"
 
 using namespace std;
+using namespace PollerShortNames;
 
 LinkQueue::LinkQueue( const string & link_name, const string & filename, const string & logfile,
                       const bool repeat, const bool graph_throughput, const bool graph_delay,
@@ -28,6 +33,7 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
       delay_graph_( nullptr ),
       repeat_( repeat ),
       finished_( false ),
+      listener_socket_name_(),
       listener_socket_()
 {
     assert_not_root();
@@ -104,9 +110,19 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
                                                  [] ( int, int & x ) { x = -1; } ) );
     }
 
-    listener_socket_.bind( Address::local( "test_file" ) );
+    ostringstream socket_name;
+    socket_name << link_name << "_aqm_socket";
+    listener_socket_name_ = socket_name.str();
+    unlink( listener_socket_name_.c_str() );
+    listener_socket_.bind( Address::local( listener_socket_name_ ) );
     listener_socket_.listen();
 }
+
+// LinkQueue::~LinkQueue()
+// {
+//     listener_socket_.close();
+//     SystemCall( "unlink", unlink( listener_socket_name_.c_str() ) );
+// }
 
 void LinkQueue::record_arrival( const uint64_t arrival_time, const size_t pkt_size )
 {
@@ -266,15 +282,33 @@ void LinkQueue::loop( LocalStreamSocket & client )
 {
     Poller poller;
 
-    string buffer = client.read()
-    cerr << buffer << endl;
-    client.write("Koo koo kachoo");
+    queue<string> client_responses;
+
+    poller.add_action( Poller::Action( client, Direction::In,
+                       [&] () {
+                           string buffer = client.read();
+                           client_responses.push( packet_queue_->interpret_command( buffer) );
+                           return ResultType::Continue;
+                       },
+                       [&] () { return not client.eof(); } ) );
+
+    poller.add_action( Poller::Action( client, Direction::Out,
+                       [&] () {
+                           client.write( client_responses.front() );
+                           client_responses.pop();
+                           return ResultType::Continue;
+                       },
+                       [&] () { return not client_responses.empty(); } ) );
+
+    while ( true ) {
+        if ( poller.poll( -1 ).result == Poller::Result::Type::Exit ) {
+            return;
+        }
+    }
 }
 
 void LinkQueue::handle_connection( void )
 {
-    LocalStreamSocket client_socket = listener_socket_.accept();
-
     thread newthread( [&] ( LocalStreamSocket client ) {
             try {
                 loop( client );

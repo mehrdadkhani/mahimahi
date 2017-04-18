@@ -11,7 +11,7 @@
 #include "binned_livegraph.hh"
 #include "ferry_queue.hh"
 
-class MeterQueue : AbstractFerryQueue
+class MeterQueue : public AbstractFerryQueue
 {
 private:
     std::queue<std::string> packet_queue_;

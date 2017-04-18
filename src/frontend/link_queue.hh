@@ -36,6 +36,7 @@ private:
     bool repeat_;
     bool finished_;
 
+    std::string listener_socket_name_;
     LocalStreamSocket listener_socket_;
 
     uint64_t next_delivery_time( void ) const;

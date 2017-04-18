@@ -10,7 +10,7 @@
 #include "file_descriptor.hh"
 #include "ferry_queue.hh"
 
-class DelayQueue : AbstractFerryQueue
+class DelayQueue : public AbstractFerryQueue
 {
 private:
     uint64_t delay_ms_;

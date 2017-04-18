@@ -46,6 +46,11 @@ public:
     {
         return "infinite";
     }
+
+    std::string interpret_command( const std::string & )
+    {
+        return "I DON'T SPEAK YOUR MOON LANGUAGE";
+    }
 };
 
 #endif /* INFINITE_PACKET_QUEUE_HH */ 

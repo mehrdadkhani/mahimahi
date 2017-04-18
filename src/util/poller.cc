@@ -14,17 +14,17 @@ void Poller::add_action( Poller::Action action )
     pollfds_.push_back( { action.fd.fd_num(), 0, 0 } );
 }
 
-void Poller::remove_actions_for_file( FileDescriptor & fd )
-{
-    for ( int i = actions_.size()-1; i >= 0; i-- ) {
-        if ( pollfds_[i].fd == fd )
-        {
-            pollfds_.remove(i);
-            actions_.remove(i);
-        }
-    }
-}
-
+//void Poller::remove_actions_for_file( FileDescriptor & fd )
+//{
+//    for ( int i = actions_.size()-1; i >= 0; i-- ) {
+//        if ( pollfds_[i].fd == fd.fd_num() )
+//        {
+//            pollfds_.erase(pollfds_.begin() + i);
+//            actions_.erase(actions_.begin() + i);
+//        }
+//    }
+//}
+//
 unsigned int Poller::Action::service_count( void ) const
 {
     return direction == Direction::In ? fd.read_count() : fd.write_count();
