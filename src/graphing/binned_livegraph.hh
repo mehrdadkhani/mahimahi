@@ -36,18 +36,19 @@ private:
     std::exception_ptr animation_thread_exception_;
     std::thread animation_thread_;
 
-    std::function<void(int,int&)> initialize_new_bin_;
+    std::function<void(int,int,int&)> initialize_new_bin_;
 
 public:
     BinnedLiveGraph( const std::string & name, const Graph::StylesType & styles,
                      const std::string & y_label,
                      const double multiplier, const bool rate_quantity,
                      const unsigned int bin_width_ms,
-                     const std::function<void(int,int&)> initialize_new_bin );
+                     const std::function<void(int,int,int&)> initialize_new_bin );
     ~BinnedLiveGraph();
 
     void add_value_now( const unsigned int num, const unsigned int amount );
     void set_max_value_now( const unsigned int num, const unsigned int amount );
+    void set_value_now( const unsigned int num, const unsigned int value );
 };
 
 #endif /* BINNED_LIVEGRAPH_HH */

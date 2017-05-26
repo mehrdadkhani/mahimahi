@@ -99,7 +99,9 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
                                                       8.0 / 1000000.0,
                                                       true,
                                                       500,
-                                                      [] ( int, int & x ) { x = 0; } ) );
+                                                      [] ( int i, int, int & x ) {
+                                                          if (i < 3) x = 0;
+                                                      } ) );
     }
 
     if ( graph_delay ) {
@@ -107,7 +109,7 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
                                                  { make_tuple( 0.0, 0.25, 0.0, 1.0, false ) },
                                                  "queueing delay (ms)",
                                                  1, false, 250,
-                                                 [] ( int, int & x ) { x = -1; } ) );
+                                                 [] ( int, int, int & x ) { x = -1; } ) );
     }
 
     ostringstream socket_name;

@@ -15,7 +15,7 @@ BinnedLiveGraph::BinnedLiveGraph( const string & name,
                                   const double multiplier,
                                   const bool rate_quantity,
                                   const unsigned int bin_width_ms,
-                                  const function<void(int,int&)> initialize_new_bin )
+                                  const function<void(int,int,int&)> initialize_new_bin )
     : graph_( 640, 480, name, 0, 1, styles, "time (s)", y_label ),
       bin_width_ms_( bin_width_ms ),
       value_this_bin_( styles.size() ),
@@ -86,7 +86,7 @@ uint64_t BinnedLiveGraph::advance( void )
             graph_.add_data_point( i,
                                    (current_bin_ + 1) * bin_width_ms_ / 1000.0,
                                    value );
-            initialize_new_bin_( bin_width_ms_, value_this_bin_[ i ] );
+            initialize_new_bin_( i, bin_width_ms_, value_this_bin_[ i ] );
         }
         current_bin_++;
     }
@@ -105,6 +105,19 @@ void BinnedLiveGraph::add_value_now( const unsigned int num, const unsigned int 
     }
 
     value_this_bin_.at( num ) += amount;
+}
+
+void BinnedLiveGraph::set_value_now( const unsigned int num, const unsigned int value )
+{
+    advance();
+
+    unique_lock<mutex> ul { mutex_ };
+
+    if ( value_this_bin_.at( num ) < 0 ) {
+        throw runtime_error( "BinnedLiveGraph: attempt to add to a default value" );
+    }
+
+    value_this_bin_.at( num ) = value;
 }
 
 void BinnedLiveGraph::set_max_value_now( const unsigned int num, const unsigned int amount )
