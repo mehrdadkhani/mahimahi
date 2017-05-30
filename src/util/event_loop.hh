@@ -31,10 +31,11 @@ public:
     void add_simple_input_handler( FileDescriptor & fd, const Poller::Action::CallbackType & callback );
 
     template <typename... Targs>
-    void add_child_process( Targs&&... Fargs )
+    ChildProcess & add_child_process( Targs&&... Fargs )
     {
         child_processes_.emplace_back( -1,
                                        ChildProcess( std::forward<Targs>( Fargs )... ) );
+        return child_processes_.back().second;
     }
 
     template <typename... Targs>

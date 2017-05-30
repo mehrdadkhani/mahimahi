@@ -109,7 +109,7 @@ void PacketShell<FerryQueueType>::start_uplink( const string & shell_prefix,
                                           egress_addr().ip().c_str(),
                                           false /* don't override */ ) );
 
-            inner_ferry.add_child_process( join( command ), [&]() {
+            auto & inner_command = inner_ferry.add_child_process( join( command ), [&]() {
                     /* tweak bash prompt */
                     prepend_shell_prefix( shell_prefix );
 
@@ -121,7 +121,9 @@ void PacketShell<FerryQueueType>::start_uplink( const string & shell_prefix,
 
             FerryQueueType uplink_queue { ferry_maker() };
             uplink_queue.register_events( inner_ferry );
-            return inner_ferry.loop( uplink_queue, ingress_tun, egress_tun_ );
+            auto result = inner_ferry.loop( uplink_queue, ingress_tun, egress_tun_ );
+            inner_command.signal( SIGTERM );
+            return result;
         }, true );  /* new network namespace */
 }
 
